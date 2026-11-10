@@ -5,11 +5,11 @@ const NavBar = () => {
         <div className="container">
             <header>
                 <nav>
-                    <a href="/" class="logo">
+                    <a href="/" className="logo">
                         🛒 Маркетплейс
                     </a>
 
-                    <ul class="nav-links" id="guest-nav">
+                    <ul className="nav-links" id="guest-nav">
                         <li>
                             <Link to={'/'}>Домой</Link>
                         </li>
