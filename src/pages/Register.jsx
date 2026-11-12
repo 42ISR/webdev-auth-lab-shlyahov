@@ -1,104 +1,129 @@
-import { useState } from 'react'
-import Button from '../components/Button'
-import Input from '../components/Input'
-import { Link } from 'react-router-dom'
+
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import Button from "../components/Button"
+import Input from "../components/Input"
+import { api } from "../api/api"
+import { useUserStore } from "../store/useUserStore"
 
 const Register = () => {
-    return (
-        <div className="container">
-            <div class="auth-container">
-                <div class="auth-header">
-                    <div class="auth-icon">👤</div>
-                    <h1 class="auth-title">Регистрация</h1>
-                    <p class="auth-subtitle">Создайте новый аккаунт</p>
-                </div>
+  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
+  const setSession = useUserStore((state) => state.setSession)
 
-                <div class="alert alert-error" id="error-alert">
-                    Такое имя пользователя уже занято
-                </div>
-                <div className="auth-error">Ошибка</div>
-                <form id="register-form">
-                    <div class="form-group">
-                        <label class="form-label">Имя пользователя</label>
-                        <Input
-                            type="text"
-                            class="form-input"
-                            name="username"
-                            placeholder="Введите имя пользователя"
-                            minlength="3"
-                            required
-                            autocomplete="username"
-                        />
-                        <div class="form-hint">Минимум 3 символа</div>
-                        <div class="form-error">
-                            Имя пользователя должно быть не менее 3 символов
-                        </div>
-                    </div>
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError("")
 
-                    <div class="form-group">
-                        <label class="form-label">
-                            Email <span class="optional">(необязательно)</span>
-                        </label>
-                        <Input
-                            type="email"
-                            class="form-input"
-                            name="email"
-                            placeholder="example@email.com"
-                            autocomplete="email"
-                        />
-                        <div class="form-error">Введите корректный email</div>
-                    </div>
+    const form = e.currentTarget
 
-                    <div class="form-group">
-                        <label class="form-label">Пароль</label>
-                        <Input
-                            type="password"
-                            class="form-input"
-                            name="password"
-                            placeholder="Введите пароль"
-                            minlength="6"
-                            required
-                            autocomplete="new-password"
-                        />
-                        <div class="password-strength">
-                            <div
-                                class="password-strength-bar"
-                                id="password-strength-bar"></div>
-                        </div>
-                        <div class="form-hint">Минимум 6 символов</div>
-                        <div class="form-error">
-                            Пароль должен быть не менее 6 символов
-                        </div>
-                    </div>
+    const username = form.elements.namedItem("username").value.trim()
+    const email = form.elements.namedItem("email").value.trim()
+    const password = form.elements.namedItem("password").value
+    const password2 = form.elements.namedItem("password2").value
 
-                    <div class="form-group">
-                        <label class="form-label">Подтверждение пароля</label>
-                        <Input
-                            type="password"
-                            class="form-input"
-                            name="password2"
-                            placeholder="Повторите пароль"
-                            required
-                            autocomplete="new-password"
-                        />
-                        <div class="form-error">Пароли не совпадают</div>
-                    </div>
+    if (password !== password2) {
+      setError("Пароли не совпадают")
+      return
+    }
 
-                    <Button type="submit" class="btn-submit">
-                        Зарегистрироваться
-                    </Button>
-                </form>
+    const user = { username, password }
 
-                <div class="auth-divider">или</div>
+    if (email) {
+      user.email = email
+    }
 
-                <div class="auth-link">
-                    <p>
-                        <Link to={'/login'}>Войти</Link>
-                    </p>
-                </div>
-            </div>
+    try {
+      setIsLoading(true)
+      const data = await api.registerUser(user)
+      setSession(data)
+      navigate("/")
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Ошибка регистрации"
+      )
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="container">
+      <div className="auth-container">
+        <div className="auth-header">
+          <div className="auth-icon">👤</div>
+          <h1 className="auth-title">Регистрация</h1>
+          <p className="auth-subtitle">Создайте новый аккаунт</p>
         </div>
-    )
+
+        {error && (
+          <div className="alert alert-error active">{error}</div>
+        )}
+
+        <form id="register-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Имя пользователя</label>
+            <Input
+              type="text"
+              name="username"
+              placeholder="Введите имя пользователя"
+              minLength={3}
+              autoComplete="username"
+              required
+            />
+            <div className="form-hint">Минимум 3 символа</div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">
+              Email <span className="optional">(необязательно)</span>
+            </label>
+            <Input
+              type="email"
+              name="email"
+              placeholder="example@email.com"
+              autoComplete="email"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Пароль</label>
+            <Input
+              type="password"
+              name="password"
+              placeholder="Введите пароль"
+              minLength={6}
+              autoComplete="new-password"
+              required
+            />
+            <div className="form-hint">Минимум 6 символов</div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Подтверждение пароля</label>
+            <Input
+              type="password"
+              name="password2"
+              placeholder="Повторите пароль"
+              autoComplete="new-password"
+              required
+            />
+          </div>
+
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Регистрация..." : "Зарегистрироваться"}
+          </Button>
+        </form>
+
+        <div className="auth-divider">или</div>
+
+        <div className="auth-link">
+          Уже есть аккаунт? <Link to="/login">Войти</Link>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default Register
