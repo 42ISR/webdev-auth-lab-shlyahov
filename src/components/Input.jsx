@@ -1,10 +1,14 @@
-const Input = (props) => {
-    return (
-        <div className="input-group">
-            {props.label && <label htmlFor="" className="input-label">{props.label}</label>}
-            <input type="text" className="input-field" {...props} />
-        </div>
-    )
+const Input = ({ label, className = "", id, ...props }) => {
+  return (
+    <div className="input-group">
+      {label && <label htmlFor={id} className="input-label">{label}</label>}
+      <input
+        id={id}
+        {...props}
+        className={`input-field ${className}`.trim()}
+      />
+    </div>
+  )
 }
 
 export default Input

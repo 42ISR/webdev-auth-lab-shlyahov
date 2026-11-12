@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import Button from "../components/Button"
@@ -18,7 +17,7 @@ const Login = () => {
 
     const form = e.currentTarget
     const user = {
-      username: form.elements.namedItem("username").value,
+      username: form.elements.namedItem("username").value.trim(),
       password: form.elements.namedItem("password").value,
     }
 
@@ -43,43 +42,45 @@ const Login = () => {
           <p className="auth-subtitle">Войдите в свой аккаунт</p>
         </div>
 
-        {error && (
-          <div className="alert alert-error active">{error}</div>
-        )}
+        {error && <div className="alert alert-error active">{error}</div>}
 
         <form id="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Имя пользователя</label>
+            <label className="form-label" htmlFor="login-username">Имя пользователя</label>
             <Input
+              id="login-username"
               type="text"
+              className="form-input"
               name="username"
               placeholder="Введите имя пользователя"
               autoComplete="username"
               required
             />
+            <div className="form-error">Введите имя пользователя</div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Пароль</label>
+            <label className="form-label" htmlFor="login-password">Пароль</label>
             <Input
+              id="login-password"
               type="password"
+              className="form-input"
               name="password"
               placeholder="Введите пароль"
               autoComplete="current-password"
               required
             />
+            <div className="form-error">Введите пароль</div>
           </div>
 
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" className="btn-submit" disabled={isLoading}>
             {isLoading ? "Выполняется вход..." : "Войти"}
           </Button>
         </form>
 
         <div className="auth-divider">или</div>
-
         <div className="auth-link">
-          Нет аккаунта?{" "}
-          <Link to="/register">Зарегистрироваться</Link>
+          Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
         </div>
       </div>
     </div>
